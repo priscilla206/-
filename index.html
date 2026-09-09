@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Galáxia de Lírios - Você é Preciosa</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;overflow:hidden;font-family:'Poppins',sans-serif;touch-action:none}
+canvas{position:fixed;top:0;left:0;width:100%;height:100%}
+
+#rotateOverlay{
+ position:fixed;z-index:100;inset:0;background:radial-gradient(circle at center,#1a0a1a,#000);
+ display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;
+}
+#rotateOverlay h1{font-family:'Dancing Script',cursive;font-size:2.2rem;color:#ff8ec7;text-shadow:0 0 20px #ff3b9a}
+#rotateIcon{font-size:5rem;margin:20px;animation:rotateAnim 2s infinite}
+@keyframes rotateAnim{0%{transform:rotate(0)}50%{transform:rotate(90deg)}100%{transform:rotate(90deg)}}
+#rotateOverlay p{opacity:.7;margin-top:10px;font-size:.9rem}
+#rotateOverlay button{margin-top:25px;padding:12px 30px;border-radius:30px;border:none;background:linear-gradient(90deg,#ff3b9a,#ff8ec7);color:#fff;font-weight:700;font-size:1rem;box-shadow:0 0 25px #ff3b9a}
+
+#startScreen{
+ position:fixed;z-index:90;inset:0;background:radial-gradient(circle at center,#1a0a1a 0%, #000 70%);
+ display:none;flex-direction:column;align-items:center;justify-content:center;
+}
+.lirio-central{
+ font-size:110px;filter:drop-shadow(0 0 15px #ff6bb5) drop-shadow(0 0 40px #ff3b9a) drop-shadow(0 0 80px #ff1a8a);
+ animation:pulse 2s infinite alternate;
+}
+@keyframes pulse{from{transform:scale(.95);filter:drop-shadow(0 0 15px #ff6bb5) drop-shadow(0 0 30px #ff3b9a)} to{transform:scale(1.08);filter:drop-shadow(0 0 25px #ff6bb5) drop-shadow(0 0 60px #ff3b9a) drop-shadow(0 0 100px #ff1a8a)}}
+#startScreen h2{margin-top:15px;font-family:'Dancing Script',cursive;font-size:2.2rem;color:#ffc2e0;text-shadow:0 0 15px #ff3b9a;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.6}}
+#topTitle{
+ position:fixed;top:15px;left:0;right:0;z-index:10;text-align:center;
+ font-family:'Dancing Script',cursive;font-size:2rem;color:#ffc2e0;
+ text-shadow:0 0 10px #ff3b9a,0 0 30px #ff3b9a;pointer-events:none;opacity:0;transition:1s;
+}
+
+.flower{position:fixed;pointer-events:none;z-index:5;will-change:transform}
+.biblia{position:fixed;pointer-events:none;z-index:6;font-family:'Dancing Script',cursive;color:#fff;white-space:nowrap;will-change:transform;text-shadow:0 0 8px currentColor}
+</style>
+</head>
+<body>
+
+<div id="rotateOverlay">
+ <div id="rotateIcon">📱↔️</div>
+ <h1>Vire a tela na diagonal</h1>
+ <p>Para uma experiência completa,<br>coloque o celular na horizontal</p>
+ <button onclick="iniciarExperiencia()">ENTRAR NA GALÁXIA</button>
+ <p style="margin-top:20px;font-size:.7rem;opacity:.4">Toque para continuar</p>
+</div>
+
+<div id="startScreen">
+ <div class="lirio-central">🪷</div>
+ <h2>Toca para iniciar</h2>
+</div>
+
+<div id="topTitle">Você é Preciosa para Deus 🪷</div>
+<canvas id="galaxy"></canvas>
+
+<script>
+const canvas = document.getElementById('galaxy');
+const ctx = canvas.getContext('2d');
+let W,H, particles=[], flowers=[], textos=[];
+let started=false, expand=0;
+
+const frases = [
+ "Você é preciosa - Isaías 43:4",
+ "Filha amada do Pai",
+ "Obra-prima de Deus - Efésios 2:10",
+ "Você é forte e corajosa - Josué 1:9",
+ "Deus te fez única e linda - Salmos 139:14",
+ "Você é luz do mundo - Mateus 5:14",
+ "Amada com amor eterno - Jeremias 31:3",
+ "Menina dos olhos de Deus - Zacarias 2:8",
+ "Você tem valor incomparável",
+ "Deus se alegra em você - Sofonias 3:17",
+ "Você é escolhida e amada",
+ "Princesa do Senhor",
+ "Você é coroa de glória - Isaías 62:3",
+ "Preciosa e honrada para Deus",
+ "Sempre amada, nunca esquecida",
+ "Você reflete a beleza de Deus",
+ "Deus tem planos lindos pra você - Jeremias 29:11"
+];
+
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}
+window.addEventListener('resize',resize);resize();
+
+// Cria estrelas da galáxia
+for(let i=0;i<2500;i++){
+ particles.push({
+   angle: Math.random()*Math.PI*2,
+   radius: Math.random()*Math.random()* (Math.min(W,H)*1.2),
+   speed: 0.0003 + Math.random()*0.001,
+   size: Math.random()*1.8,
+   alpha: Math.random()
+ })
+}
+
+function criarElementos(){
+ for(let i=0;i<22;i++){
+   const el=document.createElement('div');
+   el.className='flower';
+   el.innerHTML='🪷';
+   el.style.fontSize=(28+Math.random()*38)+'px';
+   el.style.filter='drop-shadow(0 0 10px #ff6bb5) drop-shadow(0 0 20px #ff3b9a)';
+   document.body.appendChild(el);
+   flowers.push({el, angle: (Math.PI*2/22)*i, radius: 80+Math.random()*200, speed:0.0008+Math.random()*0.0015, z: Math.random()*2000-1000, scale:0.7+Math.random()*0.6})
+ }
+ for(let i=0;i<35;i++){
+   const el=document.createElement('div');
+   el.className='biblia';
+   el.innerText=frases[i%frases.length];
+   const isPink = i%2==0;
+   el.style.color=isPink?'#ffc2e0':'#ffe6f2';
+   el.style.fontSize=(14+Math.random()*18)+'px';
+   document.body.appendChild(el);
+   textos.push({el, angle: Math.random()*Math.PI*2, radius: 150+Math.random()*700, speed:0.0002+Math.random()*0.0008, z: Math.random()*3000-1500})
+ }
+}
+
+function iniciarExperiencia(){
+ document.getElementById('rotateOverlay').style.display='none';
+ document.getElementById('startScreen').style.display='flex';
+ if(screen.orientation && screen.orientation.lock){
+   screen.orientation.lock('landscape').catch(()=>{})
+ }
+}
+
+document.getElementById('startScreen').addEventListener('click',()=>{
+ document.getElementById('startScreen').style.display='none';
+ document.getElementById('topTitle').style.opacity='1';
+ started=true;
+ criarElementos();
+ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
+});
+
+let time=0;
+function animate(){
+ requestAnimationFrame(animate);
+ time+=0.016;
+ ctx.fillStyle='rgba(0,0,0,0.25)';
+ ctx.fillRect(0,0,W,H);
+
+ // Buraco negro central + anel rosa brilhante
+ const cx=W/2, cy=H/2;
+ const expFactor = started ? Math.min(1, expand+=0.008) : 0;
+
+ // anel
+ ctx.beginPath();
+ ctx.arc(cx,cy, 45 + Math.sin(time*2)*5, 0, Math.PI*2);
+ ctx.strokeStyle='#ff3b9a';
+ ctx.lineWidth=4;
+ ctx.shadowBlur=30; ctx.shadowColor='#ff3b9a';
+ ctx.stroke();
+ ctx.shadowBlur=0;
+ ctx.beginPath();
+ ctx.arc(cx,cy, 50, 0, Math.PI*2);
+ ctx.strokeStyle='rgba(255,142,199,0.6)';
+ ctx.lineWidth=12;ctx.stroke();
+
+ // buraco
+ ctx.beginPath();
+ ctx.arc(cx,cy,38,0,Math.PI*2);
+ ctx.fillStyle='#000';ctx.fill();
+
+ // particulas girando em diagonal
+ particles.forEach(p=>{
+   p.angle+=p.speed * (1+expFactor*3);
+   const r = p.radius * (0.2 + expFactor*0.8 + Math.sin(time*0.5+p.angle)*0.05);
+   // inclinação diagonal
+   const tilt = 0.6; // diagonal
+   const x = cx + Math.cos(p.angle)*r;
+   const y = cy + Math.sin(p.angle)*r*tilt + Math.sin(p.angle*2)*10*expFactor;
+   const alpha = 0.3 + Math.sin(time + p.angle)*0.4 + 0.4;
+   ctx.beginPath();
+   ctx.arc(x,y,p.size,0,Math.PI*2);
+   ctx.fillStyle=`rgba(255,${180+Math.random()*50},${200+Math.random()*55},${alpha})`;
+   ctx.fill();
+ });
+
+ if(!started) return;
+
+ // Flores em órbita 3D diagonal
+ flowers.forEach(f=>{
+   f.angle+=f.speed;
+   f.z+=2; if(f.z>1000) f.z=-1000;
+   const perspective = 500/(500+f.z+1000);
+   const r = f.radius * expand * 1.5;
+   const x = cx + Math.cos(f.angle)*r * perspective;
+   const y = cy + Math.sin(f.angle)*r*0.6 * perspective;
+   const s = f.scale*perspective*2.5;
+   f.el.style.transform=`translate(${x}px,${y}px) scale(${s}) translate(-50%,-50%) rotate(${f.angle}rad)`;
+   f.el.style.opacity=perspective;
+ });
+
+ textos.forEach(t=>{
+   t.angle+=t.speed;
+   t.z+=1.2; if(t.z>1000) t.z=-2000;
+   const perspective = 400/(400+t.z+1000);
+   const r = t.radius * expand;
+   const x = cx + Math.cos(t.angle)*r * perspective;
+   const y = cy + Math.sin(t.angle)*r*0.6 * perspective;
+   t.el.style.transform=`translate(${x}px,${y}px) scale(${perspective*1.5}) translate(-50%,-50%)`;
+   t.el.style.opacity=perspective;
+ });
+}
+animate();
+
+// Detecta se já está na horizontal, esconde aviso
+setInterval(()=>{
+ if(window.innerWidth>window.innerHeight){
+   document.getElementById('rotateIcon').innerHTML='✨';
+ }
+},1000);
+</script>
+</body>
+</html>
